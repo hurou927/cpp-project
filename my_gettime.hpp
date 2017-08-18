@@ -43,64 +43,81 @@
 #endif
 
 #ifdef __cplusplus
-	#define __DEFAULT_TIME_UNIT "s"
-	#define __DEFAULT_MAX_EVENT_NUM 20
-
 
 	#include <vector>
 	#include <iostream>
 	#include <cstdio>
 	#include <string>
 	#include <map>
-	using namespace std;
+//	using namespace std;
 
+	enum tsUnitOfTime{
+		timeStampNanosecond = 0,
+		timeStampMicrosecond,
+		timeStampMillisecond,
+		timeStampSecond,
+	};
+	#define __DEFAULT_TIME_UNIT (timeStampSecond)
+	#define __DEFAULT_MAX_EVENT_NUM 20
 
 	class timeStamp{
 	public:
-		timeStamp()                           { initialize(__DEFAULT_MAX_EVENT_NUM ,__DEFAULT_TIME_UNIT); };
-		timeStamp(int num)                    { initialize(num                     ,__DEFAULT_TIME_UNIT); };
-		timeStamp(string time_unit)           { initialize(__DEFAULT_MAX_EVENT_NUM ,time_unit); };
-		timeStamp(int num, string time_unit)  { initialize(num                     ,time_unit); };
-		double& operator[](int i)             { return sec_vec[i];} ;
-		void operator()()                     { sec_vec[timeCount++]=get_time_sec();};
-		void stamp()                          { sec_vec[timeCount++]=get_time_sec();};
-		double interval(int index1,int index2){ return (sec_vec[index2]-sec_vec[index1]); };
-		double  sum()                         { return sec_vec[timeCount-1]-sec_vec[0]; };
-		/*int     gettimeCount()                { return timeCount; };
-    	string  getunit()                     { return unit; };
-    	double  getxrate()                    { return xrate; } ;
-		int     getlimit()                    { return limitOfTimeCount; } ;*/
+		timeStamp()                                     { initialize(__DEFAULT_MAX_EVENT_NUM ,__DEFAULT_TIME_UNIT); };
+		timeStamp(size_t num)                           { initialize(num                     ,__DEFAULT_TIME_UNIT); };
+		timeStamp(tsUnitOfTime time_unit)               { initialize(__DEFAULT_MAX_EVENT_NUM ,time_unit); };
+		timeStamp(size_t num, tsUnitOfTime time_unit)   { initialize(num                     ,time_unit); };
+		double& operator[](size_t i)                    { return _sec_vec[i];} ;
+	//	void operator()()                           { _sec_vec[ _timeCount++ ] = get_time_sec();};
+		void stamp()                                    { _sec_vec[ _timeCount++ ] = get_time_sec();};
+		double interval  (size_t from, size_t to)       { return (_sec_vec[ to  ]  - _sec_vec[from])   * _xrate; };
+		double operator()(size_t from, size_t to)       { return (_sec_vec[ to  ]  - _sec_vec[from])   * _xrate; };
+		double operator()(size_t n)                     { return (_sec_vec[ n+1 ]  - _sec_vec[n]   )   * _xrate; };
 
-		friend ostream& operator<<(ostream& os, timeStamp &ts);
-		void print() {cout<<*this;};
+		double  sum()                                   { return (_sec_vec[ _timeCount-1 ] - _sec_vec[0]) * _xrate; };
+		/*int     gettimeCount()                { return _timeCount; };*/
+
+		friend std::ostream& operator<<(std::ostream& os, timeStamp &ts);
+		void print();// {std::cout<<*this;};
+		void print_oneLine();
 	private:
-		void initialize(int limitOfTimeCount,std::string time_unit);
-		//double xrateFromUnit();
-		vector <double> sec_vec;
-		int limitOfTimeCount;
-		int timeCount;
-	    string unit;//"ms" or "s"(default)
-	    double xrate;
-	};
-	void timeStamp::initialize(int i,std::string time_unit){
+		void initialize(size_t limitOfTimeCount,tsUnitOfTime time_unit);
 
-		sec_vec.resize(i);
-		limitOfTimeCount=i;
-		timeCount=0;
-		unit=time_unit;
-		if     (unit=="ns")    xrate=1000000000;
-		else if(unit=="micro") xrate=1000000;
-		else if(unit=="ms")    xrate=1000;
-		else if(unit=="m")     xrate=(1.0/60);
-		else if(unit=="h")     xrate=(1.0/3600);
-		else                  {xrate=1;unit="s";}
+		std::vector <double> _sec_vec;
+		size_t               _limitOfTimeCount;
+		size_t               _timeCount;
+		tsUnitOfTime         _time_unit;
+		double               _xrate;
+		std::string          _str_unit;
+	};
+	void timeStamp::initialize(size_t i,tsUnitOfTime unit){
+
+		_sec_vec.resize(i);
+		_limitOfTimeCount=i;
+		_timeCount=0;
+		_time_unit = unit;
+
+		_time_unit = unit;
+		if     (unit == timeStampNanosecond)  {_xrate = 1000000000; _str_unit = "ns"    ;}
+		else if(unit == timeStampMicrosecond) {_xrate = 1000000;    _str_unit = "micros";}
+		else if(unit == timeStampMillisecond) {_xrate = 1000;       _str_unit = "ms"    ;}
+		else if(unit == timeStampSecond)      {_xrate = 1;          _str_unit = "s"     ;}
+
+	}
+	void timeStamp::print_oneLine(){
+		for(size_t i=1;i<_timeCount;i++)
+			std::cout<<std::fixed <<(_sec_vec[i]-_sec_vec[i-1]) * _xrate <<" , "<<_str_unit/*<< std::endl*/;
+	}
+	void timeStamp::print(){
+		for(size_t i=1;i<_timeCount;i++)
+			std::cout<<std::fixed <<(_sec_vec[i]-_sec_vec[i-1]) * _xrate <<" , "<<_str_unit<< std::endl;
 	}
 
-	ostream& operator<<(ostream& os, timeStamp &ts){
-		for(int i=1;i<ts.timeCount;i++)
-			cout<<fixed <<(ts[i]-ts[i-1])*ts.xrate<<" , "<<ts.unit<<endl;
+	std::ostream& operator<<(std::ostream& os, timeStamp &ts){
+		ts.print();
 		return os;
 	}
+
+
 #else // C code
 	#include <stdio.h>
 	#include <stdlib.h>
@@ -133,7 +150,7 @@
 			printf("%f,s\n",ts->sec[i+1] - ts->sec[i]);
 		}
 	}
-	void print_timeStamp_hori(timeStamp *ts){
+	void print_timeStamp_oneLine(timeStamp *ts){
 		size_t i;
 		for(i=0;i<ts->timeCount-1;i++){
 			printf("%f,s,",ts->sec[i+1] - ts->sec[i]);

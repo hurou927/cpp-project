@@ -13,9 +13,9 @@ using namespace std;
 int main(int argc ,char **argv){
 
 	mrand mr;
-	timeStamp ts(2,"ms");
+	timeStamp ts(2,timeStampMillisecond);
 	vector <int> vec(4096);
-
+	ts.stamp();
 	EACH(k,vec)
 		(*k)=mr.rand();
 
@@ -23,8 +23,11 @@ int main(int argc ,char **argv){
 	SORT(vec);
 	ts.stamp();
 
-	cout<<ts;
-
+	//cout<<ts;
+	ts.print();
+	ts.sum();
+	cout<<ts(0,1)<<endl;
+	cout<<ts(1,2)<<endl;
 	int a=mr.rand();
     DEBUG(a);
     ERROR("error-message");
