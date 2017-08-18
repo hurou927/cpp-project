@@ -8,8 +8,8 @@
 #define RSORT(c)    sort((c).rbegin(),(c).rend())
 #define MAXINDEX(c) distance((c).begin(),max_element((c).begin(),(c).end()))
 #define MININDEX(c) distance((c).begin(),min_element((c).begin(),(c).end()))
-#define DEBUG(x)   cerr <<#x<<" = "<<(x)<<" ("<<__FILE__<<"::"<<__LINE__<<")"<<endl;
-#define ERROR(s)   cerr <<"Error::"<<__FILE__<<"::"<<__LINE__<<"::"<<__FUNCTION__<<"::"<<(s)<<endl;
+#define DEBUG(x)   std::cerr <<#x<<" = "<<(x)<<" ("<<__FILE__<<"::"<<__LINE__<<")"<<std::endl;
+#define ERROR(s)   std::cerr <<"Error::"<<__FILE__<<"::"<<__LINE__<<"::"<<__FUNCTION__<<"::"<<(s)<<std::endl;
 #define FOR(i,a,b) for (auto i=(a);i<(b);i++)
 #define RFOR(i,a,b) for (int i=(b)-1;i>=(a);i--)
 
