@@ -1,7 +1,7 @@
 #################################
 # C++ Make
 #################################
-CXXFLAGS=-O2 -g -std=c++11
+CXXFLAGS=-O2 -g -W -std=c++11
 CXXLIBS=
 CXXSRC=$(wildcard *.cpp)
 CXXTARGET=$(basename $(CXXSRC))
