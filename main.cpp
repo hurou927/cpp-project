@@ -28,8 +28,8 @@ int main(int argc ,char **argv){
 	ts.sum();
 
 	int a=mr.rand();
-    DEBUG(a);
-    ERROR("error-message");
+	DEBUG(a);
+	ERROR("error-message");
 
 	return 0;
 }

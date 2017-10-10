@@ -1,0 +1,14 @@
+In file included from main.cpp:7:0:
+my_gettime.hpp: In function ‘std::ostream& operator<<(std::ostream&, timeStamp&)’:
+my_gettime.hpp:103:15: error: ‘fixed’ was not declared in this scope
+    std::cout<<fixed <<(ts[i]-ts[i-1])*ts.xrate<<" , "<<ts.unit<<std::endl;
+               ^~~~~
+my_gettime.hpp:103:15: note: suggested alternative:
+In file included from /usr/include/c++/7.1.1/ios:42:0,
+                 from /usr/include/c++/7.1.1/ostream:38,
+                 from /usr/include/c++/7.1.1/iostream:39,
+                 from main.cpp:2:
+/usr/include/c++/7.1.1/bits/ios_base.h:1041:3: note:   ‘std::fixed’
+   fixed(ios_base& __base)
+   ^~~~~
+make: *** [main.dpp:2: main] Error 1
