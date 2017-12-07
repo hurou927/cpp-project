@@ -4,9 +4,9 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstdlib>
-#include "my_gettime.hpp"
-#include "my_random.hpp"
-#include "my_util.hpp"
+#include "header/my_gettime.hpp"
+#include "header/my_random.hpp"
+#include "header/my_util.hpp"
 //using namespace std;
 
 
