@@ -115,7 +115,7 @@ namespace mtime{
 		timeStamp(size_t num, tsUnitOfTime time_unit)   { initialize(num                     ,time_unit); };
 		double& operator[](size_t i)                    { return _sec_vec[i];} ;
 	//	void operator()()                           { _sec_vec[ _timeCount++ ] = get_time_sec();};
-		void stamp()                                    { _sec_vec[ _timeCount++ ] = get_time_sec();};
+		inline void stamp()                             { _sec_vec[ _timeCount++ ] = get_time_sec();};
 		double interval  (size_t from, size_t to)       { return (_sec_vec[ to  ]  - _sec_vec[from])   * _xrate; };
 		double operator()(size_t from, size_t to)       { return (_sec_vec[ to  ]  - _sec_vec[from])   * _xrate; };
 		double operator()(size_t n)                     { return (_sec_vec[ n+1 ]  - _sec_vec[n]   )   * _xrate; };
