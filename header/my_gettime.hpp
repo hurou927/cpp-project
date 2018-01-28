@@ -189,15 +189,14 @@ namespace mtime{
 	}
 	void print_timeStamp(timeStamp *ts){
 		size_t i;
-		for(i=0;i<ts->timeCount-1;i++){
-			printf("%f,s\n",ts->sec[i+1] - ts->sec[i]);
+		for(i=1;i<ts->timeCount;i++){
+			printf("%f,s\n",ts->sec[i] - ts->sec[i-1]);
 		}
 	}
 	void print_timeStamp_oneLine(timeStamp *ts){
 		size_t i;
-		if(ts->timeCount==0) return;
-		for(i=0;i<ts->timeCount-1;i++){
-			printf("%f,s,",ts->sec[i+1] - ts->sec[i]);
+		for(i=1;i<ts->timeCount;i++){
+			printf("%f,s,",ts->sec[i] - ts->sec[i-1]);
 		}
 	}
 
