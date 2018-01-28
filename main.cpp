@@ -13,7 +13,7 @@
 int main(int argc ,char **argv){
 
 	mrand mr;
-	timeStamp ts(2,timeStampMillisecond);
+	mtime::timeStamp ts(2,mtime::timeStampMillisecond);
 	std::vector <int> vec(4096);
 	ts.stamp();
 	EACH(k,vec)

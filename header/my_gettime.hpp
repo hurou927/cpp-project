@@ -1,35 +1,82 @@
+/*
+[] gcc main.c -O2
+[] g++ main.cpp -O2
+[] g++ main.cpp -O2 -std=c++11
+----------------------------
+* c/c++
+double start = get_time_sec();
+// hogehoge
+double end = get_time_sec();
+----------------------------
+* c++
+mtime::timeStamp timer(2,mtime::timeStampMillisecond); // instance
+timer.stamp();  //time stamp
+// hogehoge
+timer.stamp();  //time stamp
+timer.print();
+-----------------------------
+* c
+timeStamp timer;
+init_timeStamp(&timer,2);
+stamp(&timer);
+// hogehoge
+stamp(&timer);
+print_timeStamp(&timer);
+------------------------------
+*/
+
+
 #ifndef _GETTIME
 #define _GETTIME
 
-#define _USE_GETTIMEOFDAY  1
+#define _USE_GETTIMEOFDAY  0 // 1: gettimeofday 0: clock_gettime(CLOCK_REALTIME)
 #define TIME() get_time_sec()
 
 #if __cplusplus >= 201103L  //-std=c++11
 	#define __GETTIMEMETHOD "chrono"
 	#include <chrono>
+
+namespace mtime{	
 	using namespace std::chrono;
 	inline double get_time_sec(void){
 		return static_cast<double>(duration_cast<nanoseconds>(
 			steady_clock::now().time_since_epoch()).count())/1000000000;
 	}
+}
 
-#elif defined(__unix)
+#elif defined(__unix)||defined(__APPLE__)
 	#if _USE_GETTIMEOFDAY == 1
 		#include <sys/time.h>
-		#define __GETTIMEMETHOD "gettimeofday"
-		inline double get_time_sec(void){
-    		struct timeval tv;
-   			gettimeofday(&tv,NULL);
-    		return((double)(tv.tv_sec)+(double)(tv.tv_usec)/1000000);
-		}
+		
+		#if defined(__cplusplus)
+			namespace mtime{
+		#endif		
+			#define __GETTIMEMETHOD "gettimeofday"
+			inline double get_time_sec(void){
+    			struct timeval tv;
+   				gettimeofday(&tv,NULL);
+    			return((double)(tv.tv_sec)+(double)(tv.tv_usec)/1000000);
+				}
+		#if defined(__cplusplus)		
+			}
+		#endif
+
 	#else
-		#include <time.h>// -lrt
-		#define __GETTIMEMETHOD "clock_gettime"
-		inline double get_time_sec(void){
-			struct timespec ts;
-			clock_gettime(CLOCK_REALTIME,&ts);
-			return ((double)ts.tv_sec+(double)ts.tv_nsec/1000000000);
-		}
+
+		#if defined(__cplusplus)
+			namespace mtime{
+		#endif
+			#include <time.h>// -lrt
+			#define __GETTIMEMETHOD "clock_gettime"
+			inline double get_time_sec(void){
+				struct timespec ts;
+				clock_gettime(CLOCK_REALTIME,&ts);
+				return ((double)ts.tv_sec+(double)ts.tv_nsec/1000000000);
+			}
+		#if defined(__cplusplus)		
+			}
+		#endif
+
 	#endif
 #elif defined(_WIN32)
 	#define __GETTIMEMETHOD "QueryPerformanceCounter"
@@ -50,7 +97,7 @@
 	#include <string>
 	#include <map>
 //	using namespace std;
-
+namespace mtime{
 	enum tsUnitOfTime{
 		timeStampNanosecond = 0,
 		timeStampMicrosecond,
@@ -116,7 +163,7 @@
 		ts.print();
 		return os;
 	}
-
+}
 
 #else // C code
 	#include <stdio.h>
@@ -127,20 +174,16 @@
 		double *sec;
 	 } timeStamp;
 
-	 timeStamp* init_timeStamp(size_t limitOfTimeCount){
-		timeStamp *ts = (timeStamp*)malloc(sizeof(timeStamp));
+	void init_timeStamp(timeStamp *ts, size_t limitOfTimeCount){
 		ts->limitOfTimeCount = limitOfTimeCount;
 		ts->timeCount = 0;
 		ts->sec = (double *)malloc(sizeof(double)*limitOfTimeCount);
-		return ts;
 	}
 	void free_timeStamp(timeStamp *ts){
 		free(ts->sec);
-		free(ts);
-		ts = NULL;
 	}
 
-	inline void stamp(timeStamp *ts){
+	void stamp(timeStamp *ts){
 		ts->sec[ts->timeCount] = get_time_sec();
 		( ts->timeCount )++;
 	}
@@ -152,6 +195,7 @@
 	}
 	void print_timeStamp_oneLine(timeStamp *ts){
 		size_t i;
+		if(ts->timeCount==0) return;
 		for(i=0;i<ts->timeCount-1;i++){
 			printf("%f,s,",ts->sec[i+1] - ts->sec[i]);
 		}
