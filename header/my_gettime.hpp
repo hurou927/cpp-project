@@ -29,7 +29,7 @@ print_timeStamp(&timer);
 #ifndef _GETTIME
 #define _GETTIME
 
-#define _USE_GETTIMEOFDAY  0 // 1: gettimeofday 0: clock_gettime(CLOCK_REALTIME)
+#define _USE_GETTIMEOFDAY  0 // 1: gettimeofday 0: clock_gettime-CLOCK_REALTIME(-lrt)
 #define TIME() get_time_sec()
 
 #if __cplusplus >= 201103L  //-std=c++11
@@ -62,11 +62,10 @@ namespace mtime{
 		#endif
 
 	#else
-
+            #include <time.h>// -lrt
 		#if defined(__cplusplus)
 			namespace mtime{
 		#endif
-			#include <time.h>// -lrt
 			#define __GETTIMEMETHOD "clock_gettime"
 			inline double get_time_sec(void){
 				struct timespec ts;
